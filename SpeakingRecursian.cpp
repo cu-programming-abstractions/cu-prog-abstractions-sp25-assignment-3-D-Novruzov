@@ -1,12 +1,36 @@
 #include "SpeakingRecursian.h"
+
 using namespace std;
 
+
+
+#include "error.h"
+#include "vector.h"
+#include <iostream>
+#include <string>
+using namespace std;
+Vector<string> allRecursianWordsHelper(int numSyllables, string soFar, bool isFirst) {
+    if (numSyllables < 0) error("Negative syllables not allowed");
+    if (numSyllables == 0) return {soFar};
+
+    Vector<string> result;
+    string vowels = "eiu", consonants = "bknrs'";
+
+    if (isFirst) {
+        for (char v : vowels)
+            result += allRecursianWordsHelper(numSyllables - 1, soFar + v, false);
+    }
+
+    for (char c : consonants)
+        for (char v : vowels)
+            result += allRecursianWordsHelper(numSyllables - 1, soFar + c + v, false);
+
+    return result;
+}
+
 Vector<string> allRecursianWords(int numSyllables) {
-    /* TODO: Delete this comment and the next few lines, then implement
-     * this function.
-     */
-    (void) numSyllables;
-    return { };
+    return allRecursianWordsHelper(numSyllables, "", true);
+
 }
 
 

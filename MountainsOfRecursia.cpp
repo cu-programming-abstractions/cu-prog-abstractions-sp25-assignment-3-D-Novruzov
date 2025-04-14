@@ -1,4 +1,9 @@
 #include "MountainsOfRecursia.h"
+
+#include "random.h"
+#include "error.h"
+#include "vector.h"
+
 using namespace std;
 
 Vector<Point> makeMountainRange(const Point& left,
@@ -8,12 +13,32 @@ Vector<Point> makeMountainRange(const Point& left,
     /* TODO: Delete this comment and the next few lines, then implement this
      * function.
      */
-    (void) left;
-    (void) right;
-    (void) amplitude;
-    (void) decayRate;
-    return { };
+    //error case
+    if(amplitude < 0 || left.x > right.x || decayRate > 1 || decayRate < 0) {
+        error("sth wrong with the input");
+    }
+    Vector<Point> points = {};
+    //base case
+    if(right.x - left.x <= 3){
+        points.add(left);
+        points.add(right);
+        return points;
+    }
+    else{
+        Point midpoint;
+        midpoint.x = (left.x + right.x) / 2;
+        midpoint.y = ((left.y + right.y) / 2) + randomInteger(-amplitude, amplitude);
+        amplitude = amplitude * decayRate;
+        Vector<Point> leftrange = makeMountainRange(left, midpoint, amplitude, decayRate);
+        Vector<Point> rightrange = makeMountainRange(midpoint, right, amplitude, decayRate);
+        points += leftrange;
+        points.remove(points.size() - 1);
+        points += rightrange;
+
+    }
+    return points;
 }
+
 
 /* * * * * Test Cases Below This Point * * * * */
 #include "GUI/SimpleTest.h"

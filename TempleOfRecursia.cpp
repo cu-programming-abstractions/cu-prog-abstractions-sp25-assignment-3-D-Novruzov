@@ -1,11 +1,70 @@
 #include "TempleOfRecursia.h"
+
 using namespace std;
 
+
+
+#include "error.h"
+using namespace std;
+Rectangle templeHelper(const Rectangle& bounds, double widthFactor, double heightFactor, double bottomY) {
+    Rectangle rec;
+    rec.width = bounds.width * widthFactor;
+    rec.height = bounds.height * heightFactor;
+    rec.x = bounds.x + (bounds.width - rec.width) / 2;
+    rec.y = bottomY - rec.height;
+    return rec;
+}
 Vector<Rectangle> makeTemple(const Rectangle& bounds, const TempleParameters& params) {
     /* TODO: Delete this comment and the next few lines, then implement this function. */
-    (void) bounds;
-    (void) params;
-    return { };
+//milestone one: returns Vector<Rectangle> holding a single rectangle representing the base of the temple.
+    Vector<Rectangle> Recs;
+    if(params.order < 0) {error("order should not be negative");}
+    else if(params.order == 0) {return Recs;}
+    else{
+    Rectangle base = templeHelper(bounds, params.baseWidth, params.baseHeight, bounds.y + bounds.height);
+    Rectangle column = templeHelper(bounds, params.columnWidth, params.columnHeight, base.y);
+
+    Recs.add(base);
+    Recs.add(column);
+    TempleParameters newParams = params;
+    newParams.order--;
+    Rectangle upperTemple;
+    //creating  new bounds for  upper temples
+    upperTemple.height = bounds.height * params.upperTempleHeight;
+    upperTemple.width = column.width;
+    upperTemple.y = column.y - upperTemple.height;
+    upperTemple.x = column.x;
+
+    Vector<Rectangle> upper = makeTemple(upperTemple, newParams);
+    for (Rectangle rect : upper) {
+        Recs.add(rect);
+    }
+
+
+    //small temples along the bases
+    //need to create the bounding box
+    Vector<Rectangle> smallRecs; //this will store all the small rectangles
+
+    Rectangle smallTemple;
+
+
+    for(int i=0; i < params.numSmallTemples; i++) {
+
+        smallTemple.width = params.smallTempleWidth * bounds.width;
+        smallTemple.height = params.smallTempleHeight * bounds.height;
+        smallTemple.y = base.y - smallTemple.height;
+        double adjusment = (base.width - (smallTemple.width * params.numSmallTemples)) / (params.numSmallTemples - 1);
+        smallTemple.x = base.x + adjusment * i + smallTemple.width * i;
+
+        smallRecs = makeTemple(smallTemple, newParams);
+        for (Rectangle rect : smallRecs) {
+            Recs.add(rect);
+        }
+
+    }
+    }
+    return Recs;
+
 }
 
 
